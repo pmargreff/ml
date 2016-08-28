@@ -1,25 +1,37 @@
 using DataFrames, RDatasets
 
+
+# calculate entropy from a target argument
 function entropy(set, target, class)
   nrows, ncolumns = size(set)
   totalEntropy = 0.0
-  for subdf in groupby(set, target)
-    subdf_nrows, subdf_ncolumns = size(subdf)
+  for subset in groupby(set, target)
+    subset_nrows, subset_ncolumns = size(subset)
     partialEntropy = 0.0
-    for subdf_class in groupby(subdf, class)
-      partialEntropy += ((-nrow(subdf_class)/subdf_nrows) * log2(nrow(subdf_class)/subdf_nrows))
-    end
-    totalEntropy += (subdf_nrows/nrows) * partialEntropy
+    totalEntropy += (subset_nrows/nrows) * pnEntropy(subset, class)
+  end
+  return totalEntropy
+end
+
+# calculate the entropy of all positives and negatives (or choosed class) values in a set
+function pnEntropy(set, class)
+  nrows, ncolumns = size(set)
+  totalEntropy = 0.0
+  for subset in groupby(set, class)
+    subset_nrows, subset_ncolumns = size(subset)
+    totalEntropy += -(((subset_nrows/nrows)) * log2((subset_nrows/nrows)))
   end
   return totalEntropy
 end
 
 
-function gain(set)
-  value = -entropy(file)
+# calculate the gain of a set
+function gain(set, target, class)
+  value = pnEntropy(set, class) - entropy(set, target, class)
+  println(value)
 end
 
 file = readtable("beach.csv")
 
 
-println(entropy(file, :Outlook, :Beach))
+gain(file, :Wind, :Beach)
