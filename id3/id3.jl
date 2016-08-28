@@ -1,27 +1,27 @@
 using DataFrames, RDatasets
 
+# TODO: Adicionar parametro attribute, para saber sobre qual atributo alvo será feita a entropia
+# TODO: Adicianar atributo class, para saber qual é a base desejada para a divisão
 function entropy(set)
-  dataEntropy = 1.0
   df = DataFrame(names = names(set))
   nrows, ncolumns = size(set)
-  # for col in eachcol(set)
-    # println(col[:1]) 
-    # println(by(set, col[:1], nrow))
-  # end
-  resultEntropy = 0.0
-  for subdf in groupby(set, [:Beach])
-    # println(subdf)
+  totalEntropy = 0.0
+  for subdf in groupby(set, [:Outlook])
+    subdf_nrows, subdf_ncolumns = size(subdf)
+    partialEntropy = 0.0
     for test in groupby(subdf, [:Beach])
-      # println(test)
+      partialEntropy += ((-nrow(test)/subdf_nrows) * log2(nrow(test)/subdf_nrows))
     end
-    resultEntropy += ((-nrow(subdf)/nrows) * log2(nrow(subdf)/nrows))
+    totalEntropy += (subdf_nrows/nrows) * partialEntropy
   end
-  println(resultEntropy)
+  return totalEntropy
+end
 
+
+function gain(attribute, set)
+  body
 end
 
 file = readtable("beach.csv")
 
-# delete!(file, length(file))
-(entropy(file))
-  
+println(entropy(file))
