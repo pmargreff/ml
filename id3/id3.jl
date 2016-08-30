@@ -28,10 +28,31 @@ end
 # calculate the gain of a set
 function gain(set, target, class)
   value = pnEntropy(set, class) - entropy(set, target, class)
-  println(value)
+  return value
+end
+
+# find the majoritie class
+function majority(set, class)
+  df = (by(set, class, nrow))
+  
+  nrows, ncols = size(df)
+  
+  majorIndex = 1
+  majorValue = 0
+  
+  for row in 1:nrows
+    if majorValue < df[row,:x1] 
+      majorValue = df[row,:x1]
+      majorIndex = row
+    end
+  
+  end
+  return df[majorIndex, :x1]
 end
 
 file = readtable("beach.csv")
 
-
-gain(file, :Wind, :Beach)
+# println(majority(file, :Beach))
+# println(makeTree(file))
+# println(gain(file, :Outlook, :Beach))
+# make the tree finding the best attribute gain
