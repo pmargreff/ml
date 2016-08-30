@@ -45,13 +45,32 @@ function majority(set, class)
       majorValue = df[row,:x1]
       majorIndex = row
     end
-  
+    
   end
-  return df[majorIndex, :x1]
+  return df[majorIndex, class]
 end
+
+function chooseAttribute(set, class)
+  major = 0.0
+  target = ""
+  
+  attributes = names(set)
+  deleteat!(attributes, findfirst(attributes, class))
+  for attribute in attributes
+    if major < (gain(set, attribute, class)) 
+      println("Target: ", attribute, " value: ", gain(set, attribute, class), " class: ",  class)
+      major = (gain(set, attribute, class))
+      target = attribute    
+    end
+  end
+  
+  return target
+end
+
 
 file = readtable("beach.csv")
 
+println(chooseAttribute(file, :Beach))
 # println(majority(file, :Beach))
 # println(makeTree(file))
 # println(gain(file, :Outlook, :Beach))
