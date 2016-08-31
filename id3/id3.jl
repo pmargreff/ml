@@ -1,19 +1,18 @@
 using DataFrames, RDatasets
 
-
-# calculate entropy from a target argument
 function entropy(set, target, class)
   nrows, ncolumns = size(set)
   totalEntropy = 0.0
-  for subset in groupby(set, target)
+  for subset in groupby(set, class)
     subset_nrows, subset_ncolumns = size(subset)
     partialEntropy = 0.0
-    totalEntropy += (subset_nrows/nrows) * pnEntropy(subset, class)
+    if subset[1,class] == target
+      totalEntropy = pnEntropy(subset, :Beach) 
+    end
   end
   return totalEntropy
 end
 
-# calculate the entropy of all positives and negatives (or choosed class) values in a set
 function pnEntropy(set, class)
   nrows, ncolumns = size(set)
   totalEntropy = 0.0
@@ -24,11 +23,16 @@ function pnEntropy(set, class)
   return totalEntropy
 end
 
-
 # calculate the gain of a set
 function gain(set, target, class)
-  value = pnEntropy(set, class) - entropy(set, target, class)
-  return value
+  
+  nrows, ncols = size(set)
+  partialEntropy = 0.0
+  for subset in groupby(set, target)
+    subset_nrows, subset_ncolumns = size(subset)
+    partialEntropy += (subset_nrows/nrows) * entropy(set, subset[1, target], target)
+  end
+  return pnEntropy(set, class) - partialEntropy
 end
 
 # find the majoritie class
@@ -54,28 +58,25 @@ function chooseAttribute(set, attributes, class)
   major = 0.0
   target = ""
   
-  deleteat!(attributes, findfirst(attributes, class))
   for attribute in attributes
-    if major < (gain(set, attribute, class)) 
-      major = (gain(set, attribute, class))
-      target = attribute    
+    if class != attribute
+      if major < (gain(set, attribute, class)) 
+        major = (gain(set, attribute, class))
+        target = attribute
+      end
     end
   end
-  
   return target
 end
 
 # create a new set to a value and delete the best attribute column
 function createNewSet(df, best, value)
-  
   newDf = DataFrame()
   for subDf in groupby(df, best)
     if subDf[1,best] == value
       newDf = subDf
     end
   end
-  
-  delete!(newDf, best)
   
   return newDf
 end
@@ -92,24 +93,20 @@ function isUniqueClass(set, class)
 end
 
 function buildTree(set, attributes, class)
-  
-  default = majority(set, class)
-  # println(set)
   nrows, ncols = size(set)
   
   
-  if 1 == 2
-    # TODO: Pensar em alguma conversão, dicionário ou sl 
-    return default
+  # test if attributes are empty or if 
+  if ncols == 1 || nrows == 0 
+    # return default
+    return Dict("final" => "fix")
     
-  # teste if all elements from a class are the same 
-  elseif (isUniqueClass(set, class)) 
+  # test if all elements from a class are the same 
+  elseif isUniqueClass(set, class) 
     return Dict("final" => set[1,class])
   else
-    
-    best = chooseAttribute(file, attributes, class)
+    best = chooseAttribute(set, attributes, class)
     bestValues = (Set(set[best]))
-    
     nodes = Dict()
     
     for value in bestValues
@@ -119,18 +116,16 @@ function buildTree(set, attributes, class)
     tree = Dict{Any, Any}
     tree = (string(best) => nodes)
     newSet = DataFrame()
+    
     for node in bestValues
+      newSet = createNewSet(set, best, node)
       newAttributes = copy(attributes)
       deleteat!(newAttributes, findfirst(newAttributes, best))
-      # newSet = createNewSet(set, best, value)
-      # nodes[node] = buildTree(newSet, newAttributes, class)
+      nodes[node] = buildTree(newSet, newAttributes, class)
     end
   end
   return tree
 end
 file = readtable("beach.csv")
 
-# println(majority(file, :Beach))
 println(buildTree(file, names(file), :Beach))
-# println(createNewSet(file, names(file), :Outlook, "Rain"))
-# make the tree finding the best attribute gain
