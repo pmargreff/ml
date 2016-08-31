@@ -50,15 +50,13 @@ function majority(set, class)
   return df[majorIndex, class]
 end
 
-function chooseAttribute(set, class)
+function chooseAttribute(set, attributes, class)
   major = 0.0
   target = ""
   
-  attributes = names(set)
   deleteat!(attributes, findfirst(attributes, class))
   for attribute in attributes
     if major < (gain(set, attribute, class)) 
-      println("Target: ", attribute, " value: ", gain(set, attribute, class), " class: ",  class)
       major = (gain(set, attribute, class))
       target = attribute    
     end
@@ -67,11 +65,62 @@ function chooseAttribute(set, class)
   return target
 end
 
+# create a new set to a value and delete the best attribute column
+function createNewSet(df, best, value)
+  
+  newDf = DataFrame()
+  for subDf in groupby(df, best)
+    if subDf[1,best] == value
+      newDf = subDf
+    end
+  end
+  
+  delete!(newDf, best)
+  
+  return newDf
+end
 
+function buildTree(set, attributes, class)
+  
+  default = majority(set, class)
+  # println(set)
+  nrows, ncols = size(set)
+  
+  if 1 == 2
+    # TODO: Pensar em alguma conversão, dicionário ou sl 
+    return default
+    
+  elseif 1 == 3
+    return "something"
+    
+  else
+    
+    best = chooseAttribute(file, attributes, class)
+    bestValues = (Set(set[best]))
+    
+    nodes = Dict()
+    
+    for value in bestValues
+      nodes[value] = Dict()
+    end
+    
+    tree = Dict{Any, Any}
+    tree = (string(best) => nodes)
+    for node in bestValues
+      newAttributes = copy(attributes)
+      deleteat!(newAttributes, findfirst(newAttributes, best))
+      newSet = createNewSet(set, best, value)
+      println(nodes[node])
+      # nodes[node] = buildTree(newSet, newAttributes, class)
+    end
+    # buildTree(set, attributes, class)
+    # para cada valor de atributo na lista voltar para o passo dois 
+  end
+  return tree
+end
 file = readtable("beach.csv")
 
-println(chooseAttribute(file, :Beach))
 # println(majority(file, :Beach))
-# println(makeTree(file))
-# println(gain(file, :Outlook, :Beach))
+# println(buildTree(file, names(file),  :Beach))
+println(createNewSet(file, names(file), :Outlook, "Rain"))
 # make the tree finding the best attribute gain
