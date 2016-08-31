@@ -80,19 +80,31 @@ function createNewSet(df, best, value)
   return newDf
 end
 
+function isUniqueClass(set, class)
+  nrows, ncols = size(set)
+  subset = by(set, class, nrow)
+  
+  instances = subset[1,:x1]
+  if instances == nrows
+    return true
+  end
+  return false
+end
+
 function buildTree(set, attributes, class)
   
   default = majority(set, class)
   # println(set)
   nrows, ncols = size(set)
   
+  
   if 1 == 2
     # TODO: Pensar em alguma conversão, dicionário ou sl 
     return default
     
-  elseif 1 == 3
-    return "something"
-    
+  # teste if all elements from a class are the same 
+  elseif (isUniqueClass(set, class)) 
+    return Dict("final" => set[1,class])
   else
     
     best = chooseAttribute(file, attributes, class)
@@ -106,21 +118,19 @@ function buildTree(set, attributes, class)
     
     tree = Dict{Any, Any}
     tree = (string(best) => nodes)
+    newSet = DataFrame()
     for node in bestValues
       newAttributes = copy(attributes)
       deleteat!(newAttributes, findfirst(newAttributes, best))
-      newSet = createNewSet(set, best, value)
-      println(nodes[node])
+      # newSet = createNewSet(set, best, value)
       # nodes[node] = buildTree(newSet, newAttributes, class)
     end
-    # buildTree(set, attributes, class)
-    # para cada valor de atributo na lista voltar para o passo dois 
   end
   return tree
 end
 file = readtable("beach.csv")
 
 # println(majority(file, :Beach))
-# println(buildTree(file, names(file),  :Beach))
-println(createNewSet(file, names(file), :Outlook, "Rain"))
+println(buildTree(file, names(file), :Beach))
+# println(createNewSet(file, names(file), :Outlook, "Rain"))
 # make the tree finding the best attribute gain
