@@ -1,46 +1,40 @@
 using DataFrames
 
-tree = Dict{Any,Any}("Outlook"=>Dict{Any,Any}("Rain"=>"Wind"=>Dict{Any,Any}("Strong"=>Dict("final"=>"No"),"Weak"=>Dict("final"=>"Yes")),"Sunny"=>"Humidity"=>Dict{Any,Any}("High"=>Dict("final"=>"No"),"Normal"=>Dict("final"=>"Yes")),"Overcast"=>Dict("final"=>"Yes")))
+tree = Dict("Outlook"=>Dict{Any,Any}(
+        "Rain"=>"Wind"=>Dict{Any,Any}("Strong"=>Dict("final"=>"No"),"Weak"=>Dict("final"=>"Yes")),
+        "Sunny"=>"Humidity"=>Dict{Any,Any}("High"=>Dict("final"=>"No"),"Normal"=>Dict("final"=>"Yes")),
+        "Overcast"=>Dict("final"=>"Yes")))
 
 inputFile = readtable("guess.csv")
 
 function getPrediction(tree, row)
   nodeKey = string(keys(tree))
-  nodeKey = replace(nodeKey, "Any[\"" , "")
+  nodeKey = replace(nodeKey, "ASCIIString[\"" , "")
   nodeKey = replace(nodeKey, "\"]" , "")
-  
-  rowNames = names(row)
-  
-  # test if some node is final
+
+  atributeValue = cleanType("UTF8String", string(row[symbol(nodeKey)]))
+
+  # test if the value of node atribute is the same in the next node
+  # and if it's the final node
   for node in tree[nodeKey]
-    testeFinal = Dict(node[2])
-    if get(testeFinal, "final", false) != false
-      return get(testeFinal, "final", false) 
+    subtree = Dict(node[2])
+    if node[1] == atributeValue
+      if get(subtree, "final", false) != false
+        return get(subtree, "final", false) 
+      else
+        return getPrediction(subtree, row)
+      end
     end
   end
-  
-  for node in tree[nodeKey]
-    subtree = Dict{Any,Any}(node[1] => node[2]) 
-    # println(subtree)
-    testeFinal = Dict(node[2])
-    if get(testeFinal, "final", false) != false
-      println(get(testeFinal, "final", false))
-      # return get(testeFinal, "final", false) 
-    end
-  end
-  # if rowNames[1] == symbol(nodeKey)
-  # end
-  # println(row[symbol(nodeKey)])
-  # dump((testeFinal))
-  # dump(tree[nodeKey])
+  return false
 end
 
-function testValue(tree, row)
-  if tree == row
-    body
-  else 
-    return testValue(subtree, subrow)
-  end
+
+function cleanType(stringType, text)
+  text = replace(text, stringType , "")
+  text = replace(text, "[\"" , "")
+  text = replace(text, "\"]" , "")
+  return text
 end
 
-getPrediction(tree, inputFile)
+println(getPrediction(tree, inputFile))
