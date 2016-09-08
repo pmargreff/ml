@@ -8,9 +8,7 @@ tree = Dict("Outlook"=>Dict{Any,Any}(
 inputFile = readtable("guess.csv")
 
 function getPrediction(tree, row)
-  nodeKey = string(keys(tree))
-  nodeKey = replace(nodeKey, "ASCIIString[\"" , "")
-  nodeKey = replace(nodeKey, "\"]" , "")
+  nodeKey = cleanType("ASCIIString", string(keys(tree)))
 
   atributeValue = cleanType("UTF8String", string(row[symbol(nodeKey)]))
 
@@ -29,7 +27,6 @@ function getPrediction(tree, row)
   return false
 end
 
-
 function cleanType(stringType, text)
   text = replace(text, stringType , "")
   text = replace(text, "[\"" , "")
@@ -37,4 +34,10 @@ function cleanType(stringType, text)
   return text
 end
 
-println(getPrediction(tree, inputFile))
+function guessFunction(tree, inputFile)
+  for row in eachrow(inputFile)
+    println(getPrediction(tree, row))
+  end
+end
+
+guessFunction(tree, inputFile)
