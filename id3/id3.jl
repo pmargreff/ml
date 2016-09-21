@@ -110,10 +110,9 @@ function buildTree(set, attributes, class)
   nrows, ncols = size(set)
   
   
-  # test if attributes are empty or if 
-  if ncols == 1 || nrows == 0 
-    # return default
-    return Dict("final" => "fix")
+  # test if attributes are empty 
+  if ncols == 1 
+    return Dict("final" => majority(set, class))
     
     # test if all elements from a class are the same 
   elseif isUniqueClass(set, class) 
