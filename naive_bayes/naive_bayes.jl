@@ -5,13 +5,14 @@ using DataFrames
 # 1 - implementar tokenizer - DONE
 # 2 - implementar o leitor e separador de arquivo - DONE
 # 3 - entender algoritmo de classificação - DONE
-# 4 - implementar trainamento -
+# 4 - implementar trainamento - DONE
   # 4.1 - implementar priori - DONE
-  # 4.2 - implementar por classe - 
-  # 4.3 - calcular construir -
-# 5 - implementar classificador -
+  # 4.2 - implementar por classe - DONE
+  # 4.3 - calcular construir - DONE
+# 5 - implementar classificador - DONE
+# 5.05 - Passar entradas para linha de comando
+# 5.09 - Documentar
 # 5.1 refinar classificador -
-
 function tokenizer(text)
   
   words = String[]
@@ -86,17 +87,18 @@ function getConditionalProbability(path)
   return probabilitiesByClass
 end
 
-function createProbabilityFiles(prob)
+function createProbabilityFiles(prob, absPath)
   for wordProbs in prob
-    fileName = string("probabilities/",wordProbs[1], ".csv")
+    fileName = string(absPath, "/probabilities/",wordProbs[1], ".csv")
     writetable(fileName, wordProbs[2])
   end
 end
 
-dataPath = "./data";
+absPath, file = splitdir(@__FILE__())
+trainingDataPath = string(absPath,"/data/training")
 
-prior = getPriorProbability(dataPath)
+prior = getPriorProbability(trainingDataPath)
 
-prob = getConditionalProbability(dataPath)
+prob = getConditionalProbability(trainingDataPath)
 
-createProbabilityFiles(prob)
+createProbabilityFiles(prob, absPath)

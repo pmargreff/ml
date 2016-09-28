@@ -1,0 +1,5 @@
+#output files
+naive_bayes/probabilities/*
+
+#test files
+naive_bayes/test/*
