@@ -163,7 +163,6 @@ function createDecisionTreeFile(tree, guessFile, decisionTreeFile)
   close(outputFile)
 end
 
-
 if length(ARGS) == 2
   inputFile = readtable(ARGS[1])
   outputTree = buildTree(inputFile, names(inputFile), :class) 

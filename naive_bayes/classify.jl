@@ -15,7 +15,7 @@ function getTraining(traningPath)
   return training
 end
 
-function classify(training, example)
+function classifyFile(training, example)
   prior = getPrior(training)
   file = open(example)
   text = tokenizer(readstring(file))
@@ -54,7 +54,6 @@ function classify(training, example)
       value = classStats[2]
       label = classStats[1]
     end
-    println(classStats[2])
   end
   return label
 end
@@ -90,10 +89,24 @@ function tokenizer(text)
   return words  
 end
 
-absPath, file = splitdir(@__FILE__())
-classifyDataPath = string(absPath, "/test/ham/aaa.txt") 
+function classifyFolder(training, path)
+  files = readdir(path)
+  df = DataFrame(file = "a", label = "teste")
+  deleterows!(df, 1)
+  for file in files
+    filePath = string(path, file) 
+    push!(df, @data([file, classifyFile(training, filePath)]))
+  end
+  
+  outputFile = string(absPath, "/classification.csv")
+  writetable(outputFile, df)
+end
+
+global absPath, file = splitdir(@__FILE__())
+
+classifyDataPath = string(absPath, "/data/test/spam/") 
 trainingDataPath = string(absPath, "/probabilities/")
 
 training = getTraining(trainingDataPath)
 
-println(classify(training, classifyDataPath))
+classifyFolder(training, classifyDataPath)
