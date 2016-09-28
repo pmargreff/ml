@@ -1,12 +1,16 @@
 # Pkg.add("TextAnalysis")
-# using TextAnalysis
+using TextAnalysis
 using DataFrames
 # TODO:
 # 1 - implementar tokenizer - DONE
 # 2 - implementar o leitor e separador de arquivo - DONE
-# 3 - entender algoritmo de classificação
-# 4 - implementar trainamento
-# 5 - implementar classificador
+# 3 - entender algoritmo de classificação - DONE
+# 4 - implementar trainamento -
+  # 4.1 - implementar priori - DONE
+  # 4.2 - implementar por classe - 
+  # 4.3 - calcular construir -
+# 5 - implementar classificador -
+# 5.1 refinar classificador -
 
 function tokenizer(text)
   
@@ -28,7 +32,7 @@ function getWordsByClass(dataPath)
     files = (readdir(subFold))
     allWords = String[]
     
-      for fileName in files
+    for fileName in files
       filepath = string(subFold,"/",fileName)
       f = open(filepath);
       text = readstring(f)
@@ -41,7 +45,7 @@ function getWordsByClass(dataPath)
   return dict
 end
 
-function getPriorProbality(path)
+function getPriorProbability(path)
   dataDir = (readdir(path))
   occurenceDict = Dict()
   total = 0;
@@ -60,19 +64,39 @@ function getPriorProbality(path)
   return priorDict
 end
 
- 
-dataPath = "./data";
-finalDict = getWordsByClass(dataPath)
+function getConditionalProbability(path)
+  wordsByClass = getWordsByClass(path)
+  probabilitiesByClass = Dict()
+  for class in wordsByClass
+    total = 0
+    
+    df = DataFrame(word = class[2])
+    newdf = by(df,:word, nrow)
+    
+    
+    for value in newdf[:x1]
+      total += value
+    end
+    
+    probabilities = DataFrame(word = newdf[1],prob = newdf[:x1]/total)
+    
+    probabilitiesByClass[class[1]] = probabilities
+  end
 
-println(getPriorProbality(dataPath))
-
-df = DataFrame(ham = finalDict["ham"])
-newdf = by(df,:ham, nrow)
-
-total = 0
-
-for value in newdf[:x1]
-  total += value
+  return probabilitiesByClass
 end
 
-# println(total)
+function createProbabilityFiles(prob)
+  for wordProbs in prob
+    fileName = string("probabilities/",wordProbs[1], ".csv")
+    writetable(fileName, wordProbs[2])
+  end
+end
+
+dataPath = "./data";
+
+prior = getPriorProbability(dataPath)
+
+prob = getConditionalProbability(dataPath)
+
+createProbabilityFiles(prob)
