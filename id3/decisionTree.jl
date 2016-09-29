@@ -9,9 +9,9 @@ function getPrediction(tree, row)
     return get(tree, "final", false)
   end
   
-  nodeKey = cleanType("ASCIIString", string(keys(tree)))
+  nodeKey = cleanType("String", string(keys(tree)))
   
-  atributeValue = cleanType("UTF8String", string(row[symbol(nodeKey)]))
+  atributeValue = cleanType("UTF8String", string(row[Symbol(nodeKey)]))
   
   # test if the value of node atribute is the same in the next node
   for node in tree[nodeKey]
@@ -32,10 +32,26 @@ function cleanType(stringType, text)
 end
 
 function guessFunction(tree, inputFile)
-  # println(tree)
+  final = []
   for row in eachrow(inputFile)
-    println(getPrediction(tree, row))
+    push!(final, row)
+    push!(final, getPrediction(tree, row))
+    push!(final, " --- ")
   end
+  
+  return final
 end
 
-guessFunction(tree, inputFile)
+if length(ARGS) == 2
+  inputFile = readtable(ARGS[1])
+  outputFilename = string(ARGS[2])
+
+  
+  outputFile = guessFunction(tree, inputFile)
+  writedlm(outputFilename, outputFile)
+  
+else
+  println("incorrect arguments, try run:")
+  println("julia id3Test.jl data/beachTest.csv output.txt")
+  println("for more info see the readme file, yes the file's name is README and I can't imagine why.")
+end

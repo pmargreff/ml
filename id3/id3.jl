@@ -1,17 +1,3 @@
-#TODO:
-# 1 - correct the kind of dictionary generated - DONE 
-# 2 - create a executable file with generated dictionary - DONE
-# 3 - build fault function
-# 3.1 - construir um main que recebe os seguintes parametros 
-#   - arquivo de treino
-#   - arquivo de execução 
-#   - arquivo de saída dos resultados
-# 3.5 - poda
-# 4 - documentation
-# 5 - integrate both solution in one comand line script 
-# 6 - generate a json with the tree
-# 7 - tests
-  
 using DataFrames
 
 function entropy(set, target, class)
@@ -141,7 +127,7 @@ function buildTree(set, attributes, class)
 end
 
 
-function createDecisionTreeFile(tree, guessFile, decisionTreeFile)
+function createDecisionTreeFile(tree, decisionTreeFile)
   outputFile = open(decisionTreeFile, "w")  
   
   inputFile = open("decisionTree.jl")
@@ -151,25 +137,23 @@ function createDecisionTreeFile(tree, guessFile, decisionTreeFile)
       write(outputFile, "tree = Dict(")
       write(outputFile, string(tree))
       write(outputFile, ")\n")
-      write(outputFile, "inputFile = readtable(\"", guessFile ,"\")")
       
     else 
       write(outputFile, ln)
     end
   end
   
-  
   close(inputFile)
   close(outputFile)
 end
 
 
-if length(ARGS) == 2
+if length(ARGS) == 1
   inputFile = readtable(ARGS[1])
   outputTree = buildTree(inputFile, names(inputFile), :class) 
-  createDecisionTreeFile(outputTree,ARGS[2],"finalDecisionTree.jl")
+  createDecisionTreeFile(outputTree,"id3Test.jl")
 else
   println("incorrect arguments, try run:")
-  println("julia id3.jl trainingExample.csv predictableExample.csv")
+  println("julia id3.jl data/beachTraining.csv ")
   println("for more info see the readme file, yes the file's name is README and I can't imagine why.")
 end

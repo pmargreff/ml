@@ -3,3 +3,6 @@ naive_bayes/probabilities/*
 
 #test files
 naive_bayes/test/*
+
+#generated files
+id3/id3Test.jl
