@@ -1,4 +1,3 @@
-# Pkg.add("TextAnalysis")
 using TextAnalysis
 using DataFrames
 # TODO:
@@ -18,7 +17,7 @@ function tokenizer(text)
   words = String[]
   sentence = (split(text))
   for word in sentence
-    if isalpha(word)
+    if isalpha(word) && word != "a" && word != "an" && word != "the"
       push!(words, lowercase(word))
     end
   end
@@ -79,7 +78,8 @@ function getConditionalProbability(path)
       total += value
     end
     
-    probabilities = DataFrame(word = newdf[1],prob = newdf[:x1]/total)
+    repeatedWord = newdf[newdf[:x1] .> 2,:]
+    probabilities = DataFrame(word = repeatedWord[1],prob = repeatedWord[:x1]/total)
     
     probabilitiesByClass[class[1]] = probabilities
   end
@@ -94,11 +94,18 @@ function createProbabilityFiles(prob, absPath)
   end
 end
 
-absPath, file = splitdir(@__FILE__())
-trainingDataPath = string(absPath,"/data/training")
+if length(ARGS) == 1
+  absPath, file = splitdir(@__FILE__())
 
-prior = getPriorProbability(trainingDataPath)
+  trainingDataPath = string(absPath,ARGS[1])
+  
+  prior = getPriorProbability(trainingDataPath)
+  
+  prob = getConditionalProbability(trainingDataPath)
 
-prob = getConditionalProbability(trainingDataPath)
-
-createProbabilityFiles(prob, absPath)
+  createProbabilityFiles(prob, absPath)
+else
+  println("incorrect arguments, try run:")
+  println("julia naive_bayes.jl /data/training")
+  println("for more info see the readme file, yes the file's name is README and I can't imagine why.")
+end
