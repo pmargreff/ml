@@ -91,6 +91,8 @@ function tokenizer(text)
 end
 
 function classifyFolder(training, path)
+  absPath, file = splitdir(@__FILE__())
+  
   files = readdir(path)
   df = DataFrame(file = "a", label = "teste")
   deleterows!(df, 1)
@@ -104,8 +106,9 @@ function classifyFolder(training, path)
 end
 
 if length(ARGS) == 1
-  global absPath, file = splitdir(@__FILE__())
+  absPath, file = splitdir(@__FILE__())
   
+  println("absPath:" , absPath)
   classifyDataPath = string(absPath, ARGS[1]) 
   trainingDataPath = string(absPath, "/probabilities/")
   

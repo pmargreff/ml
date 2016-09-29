@@ -1,17 +1,5 @@
 using TextAnalysis
 using DataFrames
-# TODO:
-# 1 - implementar tokenizer - DONE
-# 2 - implementar o leitor e separador de arquivo - DONE
-# 3 - entender algoritmo de classificação - DONE
-# 4 - implementar trainamento - DONE
-  # 4.1 - implementar priori - DONE
-  # 4.2 - implementar por classe - DONE
-  # 4.3 - calcular construir - DONE
-# 5 - implementar classificador - DONE
-# 5.05 - Passar entradas para linha de comando
-# 5.09 - Documentar
-# 5.1 refinar classificador -
 function tokenizer(text)
   
   words = String[]
