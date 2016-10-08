@@ -47,7 +47,6 @@ function train(df,target,eta,eras)
       end
     end
     
-    era += 1
     println("Era " , era ," finished, error: " , globalError)
     
     if globalError < 0.15 || era >= eras
@@ -57,6 +56,7 @@ function train(df,target,eta,eras)
     end
     
     println("-------------------------------------------------")
+    era += 1
     
   end
 end
@@ -104,18 +104,23 @@ function getLabel(train, example)
   
   major_acc = 0.0
   major_class = ""
-  
-  for class in train 
+  first = true
+  for class in train
+    
     hit = getHit(class[2], example_array)
-    if hit > major_acc
+    
+    if first
       major_acc = hit
       major_class = class[1]
+      first = false
+    end
+    if hit > major_acc
     end
   end
-  
-  return example[1], parse(Int64,major_class)
-  
+
+  return string(example[1]), major_class
 end
+
 
 function test(file)
   
@@ -133,10 +138,23 @@ function test(file)
   
 end
 
-df = readtable("data/fast_mnist_train.csv", header = false)
 
-for i in 0:9
-  train(df,i,0.1,100)
+
+
+if length(ARGS) == 2
+  if ARGS[1] == "train"
+    df = readtable(ARGS[2], header = false)
+    for i in 0:9
+      train(df,i,0.1,100)
+    end
+  elseif ARGS[1] == "test"
+    test(ARGS[2])
+  else
+    println("README is calling you!!")
+  end
+  
+else
+  println("incorrect arguments, try run:")
+  println("julia train data/fast_mnist_train.csv")
+  println("for more info see the readme file, yes the file's name is README and I can't imagine the reason.")
 end
-
-# test("data/fast_mnist_train.csv")
