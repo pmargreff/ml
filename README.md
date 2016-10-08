@@ -16,5 +16,4 @@ All algorithms built on [Julia](http://julialang.org/) programming language, so 
 Each algorithm is in her own directory, with the respective tests. In the algorithm directory you will find the README file with instructions to run each one, and the correct file format too. 
 
 ## TODO:
- - Perceptron
  - Neural Network

@@ -1,14 +1,39 @@
+# Single Layer Perceptron in Julia
+Machine Learning algorithms
+
+## Synopsis
+
+This is a simple implementation of Simple Layer Perceptron using Julia.
+
+## Installation
+
+All algorithms built on [Julia](http://julialang.org/) programming language, so you will need instal Julia and the follow package:
+- Dataframes
+
+## Run
+
+To make the train:
+
+```
+julia single_layer_perceptron/single_layer_perceptron.jl train data/mnist_train.csv 
+```
+
+The first parameter is the mode, it could be train or test, the second parameter is the file to training. The train will be generated on directory train, and it will use that to classify the tests.
+
+To test is similar:
+
+```
+julia single_layer_perceptron/single_layer_perceptron.jl test data/mnist_test.csv 
+```
+
+## File Format
+
+The file format of the input files need to be a csv without a header. The first column have the label to class, the anothers the values. 
+
+
 ## TODO:
-- [x] modelo de perceptron
-
-- [x] modelo de treinamento
-
-- [x] rodar treino para cada número
-
-- [ ] modelo de teste
+- [ ] alterar comparação da label para strings
 
 - [ ] normalizar números
-
-- [ ] documentação
 
 - [ ] matriz de confusão e outras estátisticas
