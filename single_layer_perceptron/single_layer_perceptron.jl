@@ -5,18 +5,8 @@ type Perceptron
   x :: Array{Float64,1}
 end
 
-function sum_values(x,w)
-  total = 0.0
-  
-  for i in 1:length(x)
-    total += x[i] * w[i]
-  end
-  return total 
-  
-end
-
 function get_response(x, w)
-  total = sum_values(x,w)
+  total = sum(x.*w)
   0 < total ? res = 1.0 : res = -1.0
   return res
 end
@@ -30,6 +20,7 @@ function train(df,target,eta,eras)
   perceptron.w = rand(Float64,ncolumns)
   era = 1
   while !learned
+    println("Training era ",era)
     globalError = 0.0
     
     for row in 1:nrows
@@ -57,12 +48,15 @@ function train(df,target,eta,eras)
     end
     
     era += 1
+    println("Era " , era ," finished, error: " , globalError)
     
-    if globalError == 0.0 || era >= eras
+    if globalError < 0.15 || era >= eras
       println("Label " , target ," learned in ", era , " eras")
       saveTrain(target, perceptron.w)
       learned = true
     end
+    
+    println("-------------------------------------------------")
     
   end
 end
@@ -139,9 +133,10 @@ function test(file)
   
 end
 
-df = readtable("data/mnist_train.csv", header = false)
+df = readtable("data/fast_mnist_train.csv", header = false)
+
 for i in 0:9
-  train(df,i,0.001,10000)
+  train(df,i,0.1,100)
 end
 
 # test("data/fast_mnist_train.csv")
