@@ -198,7 +198,7 @@ if length(ARGS) == 2
   if ARGS[1] == "train"
     df = readtable(ARGS[2], header = false)
     for i in 0:9
-      training_rule(df,i,0.1,100)
+      delta_rule(df,i,0.1,100)
     end
   elseif ARGS[1] == "test"
     test(ARGS[2])
