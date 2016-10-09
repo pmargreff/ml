@@ -71,7 +71,7 @@ function delta_rule(df,target,eta,eras)
   while !learned
     println("Training era ",era)
     globalError = 0.0
-    deltaw[] = 0 * rand(Float64,ncolumns)
+    deltaw = 0 * rand(Float64,ncolumns)
     for row in 1:nrows
       label = (convert(Array,df[row,1:1]))
       label = label[1]
@@ -102,7 +102,7 @@ function delta_rule(df,target,eta,eras)
     
     println("Era " , era ," finished, error: " , globalError)
     
-    if globalError < 50 || era >= eras
+    if globalError == 0.0 || era >= eras
       println("Label " , target ," learned in ", era , " eras")
       saveTrain(target, perceptron.w)
       learned = true
@@ -197,8 +197,8 @@ end
 if length(ARGS) == 2
   if ARGS[1] == "train"
     df = readtable(ARGS[2], header = false)
-    for i in 0:9
-      delta_rule(df,i,0.1,100)
+    for i in 0:1
+      delta_rule(df,i,0.05,500)
     end
   elseif ARGS[1] == "test"
     test(ARGS[2])
