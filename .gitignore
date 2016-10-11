@@ -1,6 +1,7 @@
 #output files
 naive_bayes/probabilities/*
 single_layer_perceptron/train/*
+single_layer_perceptron/out/*
 
 #test files
 naive_bayes/test/*
