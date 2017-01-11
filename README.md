@@ -1,4 +1,4 @@
-# Machine Learn in Julia
+# Machine Learning in Julia
 Machine Learning algorithms
 
 ## Synopsis
