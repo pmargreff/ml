@@ -28,8 +28,9 @@ end
 function train(df, target, learning_rate = 0.01)
   nrows, ncols = size(df)
   
+  weights = rand_range(1.0, ncols)
+  
   for row in 1:nrows
-    weights = rand_range(1.0,ncols)
     output = 0
     output += 1 * weights[1] # bias
     
@@ -40,6 +41,7 @@ function train(df, target, learning_rate = 0.01)
     guess = activation(output)
     
     local_error = 0
+    
     #test if the guess is wrong
     if guess == 1 && df[row,1] != target
       local_error = 2
@@ -57,7 +59,7 @@ function train(df, target, learning_rate = 0.01)
     end
     
   end
-
+  
   return weights
 end
 
@@ -105,8 +107,17 @@ function main()
     end
   elseif ARGS[1] == "train"
     df = readtable(ARGS[2])
-    @time train(df, 1, 0.05)
+    
+    dir = string(now())
+    cd("output")
+    mkdir(dir)
+    for i in 0:1
+
+      weights = DataFrame(train(df, i, 0.05))
+      filename = string(dir,"/", string(i),".csv")
+      writetable(filename, weights, header = false)
+    end
   end
 end  
 
-main()
+@time main()
