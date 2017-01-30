@@ -8,3 +8,6 @@ naive_bayes/test/*
 
 #generated files
 id3/id3Test.jl
+
+# slp files
+slp/output/*

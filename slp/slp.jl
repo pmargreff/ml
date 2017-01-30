@@ -25,42 +25,58 @@ end
 # df is the dataframe with normalized data (between 0 and 1)
 # learning_rate is the learning rate value 0.01 if isn't defined
 # target is the label to be train
-function train(df, target, learning_rate = 0.01)
+function train(df, target, learning_rate = 0.01, eras = 100)
   nrows, ncols = size(df)
   
   weights = rand_range(1.0, ncols)
   
-  for row in 1:nrows
-    output = 0
-    output += 1 * weights[1] # bias
-    
-    for col in 2:ncols 
-      output += df[row, col] * weights[col]
-    end
-    
-    guess = activation(output)
-    
-    local_error = 0
-    
-    #test if the guess is wrong
-    if guess == 1 && df[row,1] != target
-      local_error = 2
-    elseif guess == -1 && df[row,1] == target
-      local_error = -2
-    end
-    
-    #adjust the weights
-    weights[1] += 1 * local_error * learning_rate
-    
-    if local_error != 0
-      for col in 2:ncols 
-        weights[col] += df[row, col] * local_error * learning_rate
+  for era in 1:eras
+    err_count = 0
+    for row in 1:nrows
+      
+      output = calc_output(df[row], weights, nrows)
+      guess = activation(output)
+      
+      local_error = 0
+      
+      #test if the guess is wrong
+      if guess == 1 && df[row,1] != target
+        local_error = 2
+      elseif guess == -1 && df[row,1] == target
+        local_error = -2
       end
+      
+      #adjust the weights
+      if local_error != 0
+        weights = update_weights(weights, df[row], learning_rate, local_error, nrows)
+      end
+      
     end
-    
   end
   
   return weights
+end
+
+function update_weights(weight, input, lr, err, size)
+  
+  input[1] = 1 #rewrite the bias in label place
+  
+  for i in 1:size 
+    weight[i] += input[i] * err * lr
+  end
+  
+  return weight
+end
+
+# get the weights, the inputs and generate the output
+function calc_output(input, weight, size)
+  output = 0
+  
+  input[1] = 1 #rewrite the bias in label place
+  
+  output = (sum(input .*weight)) / size
+  
+  return output
 end
 
 # generate a array with values between -limit and limit
@@ -71,8 +87,7 @@ function rand_range(limit, ncols)
     if signal[i] == false
       rand_arr[i] -= limit 
     end
-  end
-  
+  end  
   return rand_arr
 end
 
@@ -112,8 +127,7 @@ function main()
     cd("output")
     mkdir(dir)
     for i in 0:1
-
-      weights = DataFrame(train(df, i, 0.05))
+      weights = DataFrame(train(df, i, 0.05, 100))
       filename = string(dir,"/", string(i),".csv")
       writetable(filename, weights, header = false)
     end

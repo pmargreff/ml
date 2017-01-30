@@ -15,7 +15,7 @@ All algorithms built on [Julia](http://julialang.org/) programming language, so 
 To make the train:
 
 ```
-julia single_layer_perceptron/single_layer_perceptron.jl train data/mnist_train.csv 
+julia slp/slp.jl train data/mnist_train.csv 
 ```
 
 The first parameter is the mode, it could be train or test, the second parameter is the file to training. The train will be generated on directory train, and it will use that to classify the tests.
@@ -23,7 +23,7 @@ The first parameter is the mode, it could be train or test, the second parameter
 To test is similar:
 
 ```
-julia single_layer_perceptron/single_layer_perceptron.jl test data/mnist_test.csv 
+julia slp/slp.jl test data/mnist_test.csv 
 ```
 
 ## File Format
