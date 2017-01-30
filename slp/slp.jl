@@ -34,7 +34,7 @@ function train(df, target, learning_rate = 0.01, eras = 100)
     err_count = 0
     for row in 1:nrows
       
-      output = calc_output(df[row], weights, nrows)
+      output = calc_output(df[row,:], weights, ncols)
       guess = activation(output)
       
       local_error = 0
@@ -48,7 +48,7 @@ function train(df, target, learning_rate = 0.01, eras = 100)
       
       #adjust the weights
       if local_error != 0
-        weights = update_weights(weights, df[row], learning_rate, local_error, nrows)
+        weights = update_weights(weights, df[row, :], learning_rate, local_error, ncols)
       end
       
     end
@@ -61,7 +61,8 @@ function update_weights(weight, input, lr, err, size)
   
   input[1] = 1 #rewrite the bias in label place
   
-  for i in 1:size 
+  
+  for i in 1:size
     weight[i] += input[i] * err * lr
   end
   
@@ -70,6 +71,7 @@ end
 
 # get the weights, the inputs and generate the output
 function calc_output(input, weight, size)
+  
   output = 0
   
   input[1] = 1 #rewrite the bias in label place
@@ -103,7 +105,7 @@ function main()
   if ARGS[1] == "normalize"    
     if length(ARGS) == 2
       
-      df = readtable(ARGS[2])
+      df = readtable(ARGS[2], header = false)
       newdf = normalize(df)
       
       filename, fileformat = splitext(ARGS[2])
@@ -121,16 +123,20 @@ function main()
       writetable(newfilename, newdf, header = false)
     end
   elseif ARGS[1] == "train"
-    df = readtable(ARGS[2])
-    
-    dir = string(now())
-    cd("output")
+    df = Array(readtable(ARGS[2], header = false))
+    dir = string("output/",size(readdir("output"), 1))
     mkdir(dir)
+    
     for i in 0:1
       weights = DataFrame(train(df, i, 0.05, 100))
       filename = string(dir,"/", string(i),".csv")
       writetable(filename, weights, header = false)
     end
+  elseif ARGS[1] == "test"
+    test_df = readtable(ARGS[2])
+    weight_df = readtable(ARGS[3])
+    
+    
   end
 end  
 
