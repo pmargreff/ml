@@ -25,28 +25,30 @@ end
 # df is the dataframe with normalized data (between 0 and 1)
 # learning_rate is the learning rate value 0.01 if isn't defined
 # target is the label to be train
-function train(df, target, learning_rate = 0.01, eras = 100)
+function train(df, value, learning_rate = 0.01, eras = 100)
   nrows, ncols = size(df)
   
   weights = rand_range(1.0, ncols)
   
   for era in 1:eras
+    println(" - era: " , era)
     err_count = 0
     for row in 1:nrows
       
       output = calc_output(df[row,:], weights, ncols)
       guess = activation(output)
       
-      local_error = 0
-      
-      #test if the guess is wrong
-      if guess == 1 && df[row,1] != target
-        local_error = 2
-      elseif guess == -1 && df[row,1] == target
-        local_error = -2
+      # define if target is true
+      target = -1 
+      if value == df[row, 1]
+        target = 1
       end
       
-      #adjust the weights
+      # test if the guess is wrong
+      local_error = 0
+      local_error = target - guess
+
+      # adjust the weights
       if local_error != 0
         weights = update_weights(weights, df[row, :], learning_rate, local_error, ncols)
       end
