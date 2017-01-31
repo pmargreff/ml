@@ -25,14 +25,21 @@ end
 # df is the dataframe with normalized data (between 0 and 1)
 # learning_rate is the learning rate value 0.01 if isn't defined
 # target is the label to be train
-@everywhere function train(df, value, learning_rate = 0.01, eras = 100)
+@everywhere function train(df, value, learning_rate = 0.01, eras = 1000, max_err = 0.05)
   nrows, ncols = size(df)
   
   weights = rand_range(1.0, ncols)
   
-  for era in 1:eras
+  # for era in 1:eras
+  era = 1
+  global_err = 1
+  
+  # run while do not get total eras or have < 5% error
+  while (era < eras) && (global_err > 0.05)
+  # for era in 1:eras
+    
     println(" - era: " , era)
-    err_count = 0
+    err = 0
     for row in 1:nrows
       
       output = calc_output(df[row,:], weights, ncols)
@@ -50,10 +57,13 @@ end
       
       # adjust the weights
       if local_error != 0
+        err+=1
         weights = update_weights(weights, df[row, :], learning_rate, local_error, ncols)
       end
-      
     end
+    
+    err != 0 ? global_err = err/nrows : global_err = 0
+    era+=1
   end
   
   return weights
@@ -123,13 +133,12 @@ function main()
     df = Array(readtable(ARGS[2], header = false))
     dir = string("output/",size(readdir("output"), 1))
     mkdir(dir)
-    weights = @DArray [train(df, i, 0.05, 100) for i = 0:1];
-    # println(weights)
-    # @spawn for i in 0:1
-    # weights = DataFrame(train(df, i, 0.05, 100))
-    # fetch(weights)
-    # end 
-    for i in 0:1 
+    
+    max = 1
+    
+    weights = @DArray [train(df, i) for i = 0:max];
+    
+    for i in 0:max 
       filename = string(dir,"/", string(i),".csv")
       writetable(filename, DataFrame(weights[i+1]), header = false)
     end
