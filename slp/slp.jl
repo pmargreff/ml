@@ -1,5 +1,5 @@
 using DataFrames  
-
+@everywhere using DistributedArrays
 
 # normalize the file for 0 and 1
 # dataset is the dataframe with the values
@@ -25,7 +25,7 @@ end
 # df is the dataframe with normalized data (between 0 and 1)
 # learning_rate is the learning rate value 0.01 if isn't defined
 # target is the label to be train
-function train(df, value, learning_rate = 0.01, eras = 100)
+@everywhere function train(df, value, learning_rate = 0.01, eras = 100)
   nrows, ncols = size(df)
   
   weights = rand_range(1.0, ncols)
@@ -47,7 +47,7 @@ function train(df, value, learning_rate = 0.01, eras = 100)
       # test if the guess is wrong
       local_error = 0
       local_error = target - guess
-
+      
       # adjust the weights
       if local_error != 0
         weights = update_weights(weights, df[row, :], learning_rate, local_error, ncols)
@@ -59,11 +59,9 @@ function train(df, value, learning_rate = 0.01, eras = 100)
   return weights
 end
 
-function update_weights(weight, input, lr, err, size)
+@everywhere function update_weights(weight, input, lr, err, size)
   
   input[1] = 1 #rewrite the bias in label place
-  
-  
   for i in 1:size
     weight[i] += input[i] * err * lr
   end
@@ -72,19 +70,16 @@ function update_weights(weight, input, lr, err, size)
 end
 
 # get the weights, the inputs and generate the output
-function calc_output(input, weight, size)
-  
+@everywhere function calc_output(input, weight, size)
   output = 0
-  
   input[1] = 1 #rewrite the bias in label place
-  
   output = (sum(input .*weight)) / size
   
   return output
 end
 
 # generate a array with values between -limit and limit
-function rand_range(limit, ncols)
+@everywhere function rand_range(limit, ncols)
   signal = bitrand(ncols)
   rand_arr = rand(ncols,1)
   for i in 1:ncols 
@@ -95,7 +90,7 @@ function rand_range(limit, ncols)
   return rand_arr
 end
 
-function activation(n)
+@everywhere function activation(n)
   if n > 0
     return 1
   else
@@ -128,12 +123,17 @@ function main()
     df = Array(readtable(ARGS[2], header = false))
     dir = string("output/",size(readdir("output"), 1))
     mkdir(dir)
-    
-    for i in 0:1
-      weights = DataFrame(train(df, i, 0.05, 100))
+    weights = @DArray [train(df, i, 0.05, 100) for i = 0:1];
+    # println(weights)
+    # @spawn for i in 0:1
+    # weights = DataFrame(train(df, i, 0.05, 100))
+    # fetch(weights)
+    # end 
+    for i in 0:1 
       filename = string(dir,"/", string(i),".csv")
-      writetable(filename, weights, header = false)
+      writetable(filename, DataFrame(weights[i+1]), header = false)
     end
+    
   elseif ARGS[1] == "test"
     test_df = readtable(ARGS[2])
     weight_df = readtable(ARGS[3])
