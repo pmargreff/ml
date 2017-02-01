@@ -39,7 +39,7 @@ function main()
     
     max = 9
     
-    weights = @DArray [train(df, i, 0.005, 1000, 0.005) for i = 0:max];
+    weights = @DArray [train(df, i, 0.005, 20, 0.01) for i = 0:max];
     
     for i in 0:max 
       filename = string(dir,"/", string(i),".csv")

@@ -5,11 +5,10 @@ using DataFrames
 export test
 
 function activation(n)
-  if n > 0
-    return 1
-  else
-    return -1
+  if n > 0.5
+    return true
   end
+  return false 
 end
 
 function calc_output(input, weight, size)
@@ -85,7 +84,7 @@ function test(test_df, weights_dir)
     activation_arr = Array{Int64}(n_labels)
     
     for i in 1:size(weights,1)
-      if activation(calc_output(Array(row), weights[i,:], size(test_df,2))) == 1
+      if activation(calc_output(Array(row), weights[i,:], size(test_df,2)))
         activation_arr[i] = 1
       else
         activation_arr[i] = 0
@@ -104,4 +103,4 @@ function test(test_df, weights_dir)
   return confusion_matrix
 end
 
-end  # module Test
+end 

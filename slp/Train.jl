@@ -1,5 +1,5 @@
 module Train
-export train, update_weights, calc_output, rand_range, activation 
+export train, update_weights, calc_output, rand_range, sigmoid_activation, activation
 
 # train the data
 # df is the dataframe with normalized data (between 0 and 1)
@@ -34,12 +34,12 @@ function train(df, value, learning_rate = 0.01, eras = 1000, max_err = 0.05)
       
       # test if the guess is wrong
       local_error = 0
-      local_error = target - guess
+      local_error = guess - target
       
       # adjust the weights
       if local_error != 0
         err += 1
-        weights = update_weights(weights, df[row, :], learning_rate, local_error, ncols)
+        weights = update_weights(weights, df[row, :], -learning_rate, local_error, ncols)
       end
     end
     
@@ -92,6 +92,11 @@ function activation(n)
   else
     return -1
   end
+end
+
+function sigmoid_activation(n)
+  sig = 1.0 / (1 + exp(-n))
+  return sig
 end
 
 end  # module with train necessary functions for mnist problem
