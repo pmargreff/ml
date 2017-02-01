@@ -21,13 +21,10 @@ function train(df, value, learning_rate = 0.01, eras = 1000, max_err = 0.05)
     println(" - era: " , era)
     println(" -- global_err = " , global_err)
     err = 0
-    sum_err = 0
     for row in 1:nrows
       
       output = calc_output(df[row,:], weights, ncols)
-      # guess = activation(output)
-      guess = sigmoid_activation(output)
-      @printf " -- guess: %f output: %f \n" guess output
+      guess = activation(output)
       
       # define if target is true
       target = -1 
@@ -37,30 +34,22 @@ function train(df, value, learning_rate = 0.01, eras = 1000, max_err = 0.05)
       
       # test if the guess is wrong
       local_error = 0
-      local_error = guess - target
-      sum_err -= local_error
-
+      local_error = target - guess
+      
       # adjust the weights
       if local_error != 0
         err += 1
-        weights = update_weights(weights, df[row, :], -learning_rate, local_error, ncols)
+        weights = update_weights(weights, df[row, :], learning_rate, local_error, ncols)
       end
     end
     
-    for row in 1:nrows
-      # weights = update_weights(weights, df[row, :], learning_rate, sum_err, ncols)
-    end
-    
     err != 0 ? global_err = err/nrows : global_err = 0
-    
+    println(" -- err= " , err)
+    println(" -- nrows= " , nrows)
     era+=1
   end
   
   return weights
-end
-
-function sigmoid_activation(value)
-  1. / (1. + exp(-value))
 end
 
 function update_weights(weight, input, lr, err, size)

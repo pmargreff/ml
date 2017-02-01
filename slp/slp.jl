@@ -37,7 +37,7 @@ function main()
     dir = string("output/",size(readdir("output"), 1))
     mkdir(dir)
     
-    max = 1
+    max = 9
     
     weights = @DArray [train(df, i, 0.005, 1000, 0.005) for i = 0:max];
     

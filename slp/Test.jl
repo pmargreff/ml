@@ -12,10 +12,6 @@ function activation(n)
   end
 end
 
-function sigmoid_activation(value)
-  1. / (1. + exp(-value))
-end
-
 function calc_output(input, weight, size)
   output = 0
   input[1] = 1 #rewrite the bias in label place
@@ -89,7 +85,7 @@ function test(test_df, weights_dir)
     activation_arr = Array{Int64}(n_labels)
     
     for i in 1:size(weights,1)
-      if sigmoid_activation(calc_output(Array(row), weights[i,:], size(test_df,2))) == 1
+      if activation(calc_output(Array(row), weights[i,:], size(test_df,2))) == 1
         activation_arr[i] = 1
       else
         activation_arr[i] = 0
