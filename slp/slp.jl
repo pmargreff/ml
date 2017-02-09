@@ -37,9 +37,9 @@ function main()
     dir = string("output/",size(readdir("output"), 1))
     mkdir(dir)
     
-    max = 9
+    max = 1
     
-    weights = @DArray [train(df, i, 0.005, 20, 0.01) for i = 0:max];
+    weights = @DArray [train(df, i, 0.005, 100, 0.01) for i = 0:max];
     
     for i in 0:max 
       filename = string(dir,"/", string(i),".csv")
