@@ -4,13 +4,6 @@ using DataFrames
 
 export test
 
-function is_active(n)
-  if n > 0
-    return true
-  end
-  return false 
-end
-
 function calc_output(input, weight, size)
   output = 0
   input[1] = 1 #rewrite the bias in label place
@@ -20,20 +13,6 @@ function calc_output(input, weight, size)
   end
   
   return output/size
-end
-
-function has_one_rigth(activation_arr)
-  arr = [] 
-  for val in activation_arr
-    if val == 1
-      push!(arr, 1)
-    end
-  end
-  
-  if length(arr) == 1 
-    return true
-  end
-  return false
 end
 
 function get_index(activation_arr)
@@ -58,32 +37,37 @@ end
 function test(test_df, weights_dir)
   files = readdir(weights_dir)
   
-  n_labels = length(files)
-  weights = Array{Float64}(n_labels,size(test_df,2))
-  confusion_matrix = zeros(n_labels, n_labels)
-  row = 1
+  # get the total of trained labels
+  labels_size = length(files)
+  inputs_size = size(test_df,2)
+  # create a confusion matrix
+  confusion_matrix = zeros(labels_size, labels_size)
   
-  # each row (represent a trained label)
+  # create a matrix for the weights
+  # i = labels
+  # j = inputs
+  weights = Array{Float64}(labels_size,inputs_size)
+  
+  
+  row = 1
+  # get the weights for each trained label(each label is saved in a diferent file)
   for file in files 
     filepath = string(ARGS[3],file)
     weights[row,:] = Array(readtable(filepath, header = false))
     row+=1
   end
   
+  # for each test example
   for row in eachrow(test_df)
-    activation_arr = Array{Int64}(n_labels)
-    
+    activation_arr = Array{Float64}(labels_size)
+    test_example = Array(row)
     # for each label test in all trained perceptrons
     for i in 1:size(weights,1)
-      if is_active(calc_output(Array(row), weights[i,:], size(test_df,2)))
-        activation_arr[i] = 1
-      else
-        activation_arr[i] = 0
-      end
+      activation_arr[i] = calc_output(test_example, weights[i,:], inputs_size)
     end
     
+    # get the most excited guess 
     guess = get_index(activation_arr)
-    
     confusion_matrix = count_result(row[1]+1, guess, confusion_matrix)
     
   end
